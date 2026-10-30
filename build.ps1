@@ -1,4 +1,4 @@
-﻿# Yayın derlemesi: build\bin\DuplicateFile.exe
+﻿# Yayın derlemesi: build\bin\DuplicateFileFinder.exe
 #   - sürüm wails.json'daki info.productVersion'dan alınır (exe özellikleri ve uygulama içi aynı)
 #   - -trimpath: exe'ye derleme makinesinin yerel yolları gömülmez
 #   - önce Go ve arayüz testleri çalışır; biri başarısızsa derleme yapılmaz
@@ -50,5 +50,5 @@ New-Item -ItemType Directory -Force $langOut | Out-Null
 Copy-Item 'lang\*.lng' $langOut -Force
 Write-Host ("Dil dosyaları: {0}" -f ((Get-ChildItem $langOut -Filter *.lng).BaseName -join ', '))
 
-$exe = Get-Item 'build\bin\DuplicateFile.exe'
-Write-Host ("DuplicateFile {0}: {1} ({2:N1} MB)" -f $version, $exe.FullName, ($exe.Length / 1MB)) -ForegroundColor Green
+$exe = Get-Item 'build\bin\DuplicateFileFinder.exe'
+Write-Host ("Duplicate File Finder {0}: {1} ({2:N1} MB)" -f $version, $exe.FullName, ($exe.Length / 1MB)) -ForegroundColor Green

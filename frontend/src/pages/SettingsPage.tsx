@@ -272,7 +272,7 @@ export default function SettingsPage() {
           <CardContent>
             <SectionTitle>{t('settings.about')}</SectionTitle>
             <Typography variant="body2">
-              DuplicateFile{' '}
+              Duplicate File Finder{' '}
               {appVersion
                 ? appVersion === 'dev'
                   ? t('settings.devVersion')

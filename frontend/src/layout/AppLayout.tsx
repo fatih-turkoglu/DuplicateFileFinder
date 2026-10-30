@@ -80,7 +80,7 @@ export default function AppLayout({ page, onNavigate, children }: Props) {
         }}>
           <FileCopyIcon color="primary" />
           <Typography variant="h6" component="h1" noWrap sx={{ flexGrow: 1 }}>
-            DuplicateFile
+            Duplicate File Finder
           </Typography>
           <ThemeModeButton />
         </Toolbar>

@@ -24,4 +24,4 @@ $paths = @(
 )
 $env:PATH = ($paths -join ';') + ';' + $env:PATH
 
-Write-Host "DuplicateFile ortamı etkin: $(go version), node $(node --version)" -ForegroundColor Green
+Write-Host "Duplicate File Finder ortamı etkin: $(go version), node $(node --version)" -ForegroundColor Green

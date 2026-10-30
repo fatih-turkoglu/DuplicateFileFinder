@@ -28,7 +28,7 @@ func main() {
 
 	// Create application with options
 	opts := &options.App{
-		Title:     "DuplicateFile",
+		Title:     "Duplicate File Finder",
 		Width:     1100,
 		Height:    760,
 		MinWidth:  400,
@@ -54,7 +54,7 @@ func main() {
 		opts.Menu.Append(menu.EditMenu())
 		opts.Mac = &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
-			About:    &mac.AboutInfo{Title: "DuplicateFile " + version, Message: "Duplicate and similar file finder"},
+			About:    &mac.AboutInfo{Title: "Duplicate File Finder " + version, Message: "Duplicate and similar file finder"},
 		}
 	}
 

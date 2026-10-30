@@ -1,4 +1,4 @@
-# DuplicateFile
+# Duplicate File Finder
 
 Windows ve macOS için kopya ve benzer dosya bulucu. Klasörleri tarar, içeriği birebir aynı
 dosyaları ya da birbirine benzeyen fotoğrafları gruplar; seçtiklerinizi güvenle
@@ -22,7 +22,7 @@ silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
 
 - **macOS 12 Monterey veya üzeri.** Apple Silicon (M serisi) ve Intel desteklenir;
   Universal paket her ikisini de içerir. Alt sürüm sınırı [Go 1.26 gereksiniminden](https://go.dev/wiki/MinimumRequirements) gelir.
-- ZIP’i açın, **DuplicateFile.app** dosyasını **Uygulamalar** klasörüne sürükleyin ve açın.
+- ZIP’i açın, **DuplicateFileFinder.app** dosyasını **Uygulamalar** klasörüne sürükleyin ve açın.
   Dil dosyaları uygulamanın içindedir; ayrıca `lang` klasörü taşımanız gerekmez.
 - WKWebView macOS ile gelir; WebView2 kurulumuna gerek yoktur.
 - Yerel derleme ad hoc imzalanır. Başka bilgisayarlara dağıtılacak paket için Apple
@@ -36,7 +36,7 @@ silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
 
 ### Windows kurulumu
 
-Kurulum gerekmez: `DuplicateFile.exe`'yi ve yanındaki `lang` klasörünü istediğiniz
+Kurulum gerekmez: `DuplicateFileFinder.exe`'yi ve yanındaki `lang` klasörünü istediğiniz
 klasöre koyup çalıştırın (`lang` olmadan da çalışır; arayüz İngilizce olur).
 
 - Windows 10 ya da 11 (64 bit).
@@ -110,7 +110,7 @@ klasöre koyup çalıştırın (`lang` olmadan da çalışır; arayüz İngilizc
 Windows’ta arayüz dilleri exe’nin yanındaki **`lang`** klasöründen okunur:
 
 ```
-DuplicateFile.exe
+DuplicateFileFinder.exe
 lang\
   tr.lng  de.lng  fr.lng  pt.lng  ro.lng  bg.lng  en.lng
 ```
@@ -124,7 +124,7 @@ lang\
 
 Çeviriler (Türkçe dışındakiler) ana dili o dil olan biri tarafından gözden geçirilmemiştir.
 
-macOS’ta çeviriler `DuplicateFile.app/Contents/Resources/lang` içindedir. İmzalı bir
+macOS’ta çeviriler `DuplicateFileFinder.app/Contents/Resources/lang` içindedir. İmzalı bir
 uygulamanın içeriğini değiştirmek imzayı bozacağından, özel çeviriler için
 `DUPLICATEFILE_LANG_DIR` ile ayrı klasör kullanın.
 
@@ -147,7 +147,7 @@ Windows:
 |---|---|
 | Veritabanı (önbellek) | `%LOCALAPPDATA%\DuplicateFile\index.db` (Ayarlar'dan taşınabilir) |
 | Ayar dosyası | `%LOCALAPPDATA%\DuplicateFile\config.json` |
-| Arayüz tercihleri (tema, tarama seçenekleri) | WebView2 profili: `%APPDATA%\DuplicateFile.exe\` |
+| Arayüz tercihleri (tema, tarama seçenekleri) | WebView2 profili: `%APPDATA%\DuplicateFileFinder.exe\` |
 
 `DUPLICATEFILE_DATA_DIR` ortam değişkeni tanımlıysa veritabanı ve ayar dosyası o
 klasörde tutulur (taşınabilir kullanım ve testler için).
@@ -197,7 +197,7 @@ saklar ve geliştirmede dil dosyalarını doğrudan `lang/` klasöründen okutur
 ./build.sh --skip-tests    # testleri atla
 ```
 
-Çıktı: **`build/bin/DuplicateFile.app`** ve sürüm/mimari adlı ZIP.
+Çıktı: **`build/bin/DuplicateFileFinder.app`** ve sürüm/mimari adlı ZIP.
 Betik kilitli npm bağımlılıklarını kurar, arayüzü derler, Go vet/test ve arayüz
 testlerini çalıştırır; dilleri pakete koyar, son paketi imzalayıp doğrular.
 `wails.json` sürümün tek kaynağıdır. Universal derleme macOS üzerinde yapılır.
@@ -242,7 +242,7 @@ klasörüne açın; sonra `go install github.com/wailsapp/wails/v2/cmd/wails@lat
 
 ```powershell
 wails dev          # canlı geliştirme (arayüz değişiklikleri anında yansır)
-.\build.ps1        # testler + yayın derlemesi → build\bin\DuplicateFile.exe
+.\build.ps1        # testler + yayın derlemesi → build\bin\DuplicateFileFinder.exe
 ```
 
 `build.ps1` önce bütün testleri çalıştırır; sürümü `wails.json` içindeki

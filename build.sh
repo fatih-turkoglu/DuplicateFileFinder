@@ -41,7 +41,7 @@ if [[ "$skip_tests" == false ]]; then
   (cd frontend && npm test)
 fi
 wails build -clean -s -platform "$target" -trimpath -ldflags "-X main.version=$version"
-app="build/bin/DuplicateFile.app"
+app="build/bin/DuplicateFileFinder.app"
 mkdir -p "$app/Contents/Resources/lang"
 cp lang/*.lng "$app/Contents/Resources/lang/"
 plutil -lint "$app/Contents/Info.plist"
@@ -49,7 +49,7 @@ plutil -lint "$app/Contents/Info.plist"
 # An optional Developer ID can be supplied for distribution; otherwise sign locally.
 codesign --force --deep --sign "${DUPLICATEFILE_SIGN_IDENTITY:--}" "$app"
 codesign --verify --deep --strict "$app"
-archive="build/bin/DuplicateFile-$version-${target#darwin/}.zip"
+archive="build/bin/DuplicateFileFinder-$version-${target#darwin/}.zip"
 ditto -c -k --sequesterRsrc --keepParent "$app" "$archive"
-echo "DuplicateFile $version: $app"
+echo "Duplicate File Finder $version: $app"
 echo "Archive: $archive"

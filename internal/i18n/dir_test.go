@@ -6,12 +6,12 @@ import (
 )
 
 func TestBundleLanguageDir(t *testing.T) {
-	contents := filepath.Join(t.TempDir(), "DuplicateFile.app", "Contents")
-	exe := filepath.Join(contents, "MacOS", "DuplicateFile")
+	contents := filepath.Join(t.TempDir(), "DuplicateFileFinder.app", "Contents")
+	exe := filepath.Join(contents, "MacOS", "DuplicateFileFinder")
 	if got := languageDir(exe); got != filepath.Join(contents, "Resources", "lang") {
 		t.Fatalf("bundle translations: %s", got)
 	}
-	exe = filepath.Join(t.TempDir(), "DuplicateFile")
+	exe = filepath.Join(t.TempDir(), "DuplicateFileFinder")
 	if got := languageDir(exe); got != filepath.Join(filepath.Dir(exe), "lang") {
 		t.Fatalf("standalone translations: %s", got)
 	}

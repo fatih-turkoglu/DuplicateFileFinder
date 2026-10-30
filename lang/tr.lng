@@ -1,4 +1,4 @@
-# DuplicateFile dil dosyası — Türkçe
+# Duplicate File Finder dil dosyası — Türkçe
 # Biçim: "anahtar = metin"; # ile başlayan satırlar yorumdur. {ad} yer tutucuları değiştirilmez.
 # Türkçede sayıya göre çoğul değişmediği için yalnızca .other biçimi kullanılır.
 

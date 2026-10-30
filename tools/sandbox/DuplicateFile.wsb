@@ -21,7 +21,7 @@
     </MappedFolder>
   </MappedFolders>
   <LogonCommand>
-    <Command>C:\Users\WDAGUtilityAccount\Desktop\DuplicateFile\DuplicateFile.exe</Command>
+    <Command>C:\Users\WDAGUtilityAccount\Desktop\DuplicateFile\DuplicateFileFinder.exe</Command>
   </LogonCommand>
   <Networking>Disable</Networking>
 </Configuration>

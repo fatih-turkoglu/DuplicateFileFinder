@@ -9,7 +9,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const { en } = await import(pathToFileURL(path.join(here, '..', 'src', 'i18n', 'en.ts')).href)
 const out = path.join(here, '..', '..', 'lang', 'en.lng')
 
-const header = `# DuplicateFile language file — English (template for translations)
+const header = `# Duplicate File Finder language file — English (template for translations)
 #
 # This file is generated from frontend/src/i18n/en.ts (npm run lang:en);
 # English is built into the program, so this file is only a template.
@@ -18,7 +18,7 @@ const header = `# DuplicateFile language file — English (template for translat
 #   1. Copy this file and name it after the language code, e.g. it.lng, es.lng, pt-br.lng
 #   2. Set @name (the language's own name) and @locale (for number/date formats)
 #   3. Translate the text after "=". Keep the keys and {placeholders} unchanged.
-#   4. Put the file into the "lang" folder next to DuplicateFile.exe.
+#   4. Put the file into the "lang" folder next to DuplicateFileFinder.exe.
 #
 # Format: UTF-8, one "key = text" per line. Lines starting with # are comments.
 #   \\n = new line.  Missing keys are shown in English.
