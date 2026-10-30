@@ -201,6 +201,9 @@ export default function SettingsPage() {
                   {t('settings.dbRecords', { count: info.stats.files })} ·{' '}
                   {t('settings.dbScans', { count: info.stats.scans })} · {formatBytes(info.stats.sizeBytes)}
                 </Typography>
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  {t('settings.dbPrivacy')}
+                </Alert>
                 <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: 'wrap' }}>
                   <Button startIcon={<FolderOpenIcon />} onClick={() => api.showInExplorer(info.path)}>
                     {t('settings.showFolder')}

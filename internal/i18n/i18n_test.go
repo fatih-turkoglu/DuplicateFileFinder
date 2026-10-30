@@ -119,9 +119,15 @@ func TestRealLanguageFiles(t *testing.T) {
 }
 
 func TestDirEnv(t *testing.T) {
-	t.Setenv("DUPLICATEFILE_LANG_DIR", `C:\diller`)
-	if Dir() != `C:\diller` {
+	diller := t.TempDir()
+	t.Setenv("DUPLICATEFILE_LANG_DIR", diller)
+	if Dir() != diller {
 		t.Errorf("Dir = %s", Dir())
+	}
+	// Göreli yol başlatılan klasöre göre değişir; yok sayılmalı.
+	t.Setenv("DUPLICATEFILE_LANG_DIR", "diller")
+	if !strings.HasSuffix(Dir(), "lang") {
+		t.Errorf("göreli değer kullanıldı: Dir = %s", Dir())
 	}
 	t.Setenv("DUPLICATEFILE_LANG_DIR", "")
 	if !strings.HasSuffix(Dir(), "lang") {

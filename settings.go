@@ -11,7 +11,10 @@ import (
 	"DuplicateFile/internal/appdirs"
 	"DuplicateFile/internal/apperr"
 	"DuplicateFile/internal/db"
+	"DuplicateFile/internal/i18n"
 	"DuplicateFile/internal/pathutil"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // config, uygulama ayarlarının veritabanı dışında tutulması gerekenleridir
@@ -23,14 +26,14 @@ type config struct {
 // defaultDBPath ve configFile değişkendir: testler gerçek kullanıcı
 // klasörüne dokunmasın diye geçici yollara yönlendirir.
 var defaultDBPath = func() (string, error) {
-	if dir := os.Getenv(dataDirEnv); dir != "" {
+	if dir := dataDirOverride(); dir != "" {
 		return filepath.Join(dir, "index.db"), nil
 	}
 	return db.DefaultPath()
 }
 
 var configFile = func() (string, error) {
-	if dir := os.Getenv(dataDirEnv); dir != "" {
+	if dir := dataDirOverride(); dir != "" {
 		return filepath.Join(dir, "config.json"), nil
 	}
 	dir, err := appdirs.Data()
@@ -44,6 +47,32 @@ var configFile = func() (string, error) {
 // tutulur. Uçtan uca testler gerçek kullanıcı verisine dokunmamak için
 // kullanır; taşınabilir kullanım için de işe yarar.
 const dataDirEnv = "DUPLICATEFILE_DATA_DIR"
+
+// dataDirOverride, dataDirEnv mutlak bir yolsa onu döner. Göreli bir değer
+// uygulamanın hangi klasörden başlatıldığına göre değişeceğinden yok sayılır.
+func dataDirOverride() string {
+	if dir := os.Getenv(dataDirEnv); filepath.IsAbs(dir) {
+		return dir
+	}
+	return ""
+}
+
+// logEnvOverrides, verilerin ya da dil dosyalarının ortam değişkeniyle başka
+// bir klasöre yönlendirildiğini (ya da değerin yok sayıldığını) günlüğe yazar.
+func logEnvOverrides(ctx context.Context) {
+	for _, o := range []struct{ env, used string }{
+		{dataDirEnv, dataDirOverride()},
+		{i18n.DirEnv, i18n.DirOverride()},
+	} {
+		switch v := os.Getenv(o.env); {
+		case v == "":
+		case o.used != "":
+			runtime.LogInfof(ctx, "%s=%s kullanılıyor", o.env, v)
+		default:
+			runtime.LogWarningf(ctx, "%s=%s yok sayıldı: mutlak bir yol olmalı", o.env, v)
+		}
+	}
+}
 
 func loadConfig() config {
 	var c config
@@ -60,12 +89,12 @@ func saveConfig(c config) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(p), 0o700); err != nil {
 		return err
 	}
 	data, _ := json.MarshalIndent(c, "", "  ")
 	tmp := p + ".tmp"
-	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+	if err := os.WriteFile(tmp, data, 0o600); err != nil {
 		return err
 	}
 	return os.Rename(tmp, p)
@@ -108,7 +137,7 @@ func moveDatabase(ctx context.Context, cur *db.DB, newPath string) (*db.DB, erro
 	if _, err := os.Stat(newPath); err == nil {
 		return cur, apperr.Errorf("db_target_exists", "a database already exists in the target folder: %s", newPath)
 	}
-	if err := os.MkdirAll(filepath.Dir(newPath), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(newPath), 0o700); err != nil {
 		return cur, fmt.Errorf("could not create target folder: %w", err)
 	}
 	if err := cur.Checkpoint(ctx); err != nil {
@@ -151,7 +180,7 @@ func copyFile(src, dst string) error {
 	}
 	defer in.Close()
 	tmp := dst + ".tmp"
-	out, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	out, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return err
 	}

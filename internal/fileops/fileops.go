@@ -398,12 +398,18 @@ func (s *Service) Rename(ctx context.Context, items []RenameItem, progress Progr
 			res.NewPath = dest // ad değişmedi
 			return res
 		}
-		// Yalnızca harf büyüklüğü değişiyorsa hedef dosya kaynağın kendisidir.
-		if exists(dest) && !pathutil.Same(dest, it.Path) {
+		// Yalnızca harf büyüklüğü değişiyorsa hedef dosya kaynağın kendisidir;
+		// o zaman üzerine yazılacak başka bir dosya yoktur.
+		sameFile := pathutil.Same(dest, it.Path)
+		if exists(dest) && !sameFile {
 			res.fail(ErrExists)
 			return res
 		}
-		if err := os.Rename(it.Path, dest); err != nil {
+		rename := renameNoReplace
+		if sameFile {
+			rename = os.Rename
+		}
+		if err := rename(it.Path, dest); err != nil {
 			res.fail(err)
 			return res
 		}
@@ -422,9 +428,9 @@ func (s *Service) recordMove(ctx context.Context, from, to string) string {
 }
 
 // moveFile, aynı sürücüde yeniden adlandırır; farklı sürücüde kopyalayıp
-// kaynağı siler. Çağıran, dest'in var olmadığını önceden doğrulamış olmalıdır.
+// kaynağı siler. Kontrolden sonra dest'te bir dosya belirirse ErrExists döner.
 func moveFile(src, dest string) error {
-	err := os.Rename(src, dest)
+	err := renameNoReplace(src, dest)
 	if err == nil || !isCrossDevice(err) {
 		return err
 	}

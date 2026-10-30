@@ -1,5 +1,27 @@
-import {defineConfig} from 'vite'
+import {defineConfig, type Plugin} from 'vite'
 import react from '@vitejs/plugin-react'
+
+// The bound Go methods can delete and move files, so the packaged page may only
+// run its own scripts. Emotion injects <style> tags, hence 'unsafe-inline' for
+// styles. macOS serves the app from wails://, which 'self' may not cover.
+// Production only: Vite's dev server relies on inline scripts and HMR sockets.
+const csp = [
+  "default-src 'self' wails:",
+  "script-src 'self' wails:",
+  "style-src 'self' wails: 'unsafe-inline'",
+  "img-src 'self' wails: data: blob:",
+  "font-src 'self' wails: data:",
+  "connect-src 'self' wails:",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+].join('; ')
+
+const contentSecurityPolicy = (): Plugin => ({
+  name: 'content-security-policy',
+  apply: 'build',
+  transformIndexHtml: () => [{tag: 'meta', attrs: {'http-equiv': 'Content-Security-Policy', content: csp}, injectTo: 'head-prepend'}],
+})
 
 // Büyük kütüphaneler ayrı parçalara bölünür; tek paket 500 kB uyarı sınırını aşmasın.
 const vendorChunks: Record<string, string[]> = {
@@ -11,11 +33,11 @@ const vendorChunks: Record<string, string[]> = {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), contentSecurityPolicy()],
   build: {
-    // macOS 12 ships with Safari 15's WKWebView. Vite's default targets 16.4+.
-    target: 'safari15',
-    cssTarget: 'safari15',
+    // macOS 13 (Go 1.27's minimum) ships with Safari 16's WKWebView. Vite's default targets newer.
+    target: 'safari16',
+    cssTarget: 'safari16',
     rollupOptions: {
       output: {
         manualChunks(id) {

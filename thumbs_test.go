@@ -21,8 +21,16 @@ func TestThumbMiddleware(t *testing.T) {
 	txtPath := filepath.Join(dir, "gizli.txt")
 	os.WriteFile(txtPath, []byte("okunmamalı"), 0o644)
 
+	// Taranmış ama diskte olmayan dosya ile taranmamış ama diskte duran görsel.
+	missing := filepath.Join(dir, "yok.png")
+	unscanned := filepath.Join(dir, "taranmadi.png")
+	f, _ = os.Create(unscanned)
+	png.Encode(f, image.NewRGBA(image.Rect(0, 0, 10, 10)))
+	f.Close()
+	indexed := func(p string) bool { return p == imgPath || p == txtPath || p == missing }
+
 	nextCalled := false
-	h := thumbMiddleware(newThumbCache(1 << 20))(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h := thumbMiddleware(newThumbCache(1<<20), indexed)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nextCalled = true
 	}))
 	get := func(target string) *httptest.ResponseRecorder {
@@ -42,8 +50,11 @@ func TestThumbMiddleware(t *testing.T) {
 	if rec := get(thumb("goreli.png")); rec.Code != http.StatusBadRequest {
 		t.Errorf("göreli yol: %d, beklenen 400", rec.Code)
 	}
-	if rec := get(thumb(filepath.Join(dir, "yok.png"))); rec.Code != http.StatusNotFound {
+	if rec := get(thumb(missing)); rec.Code != http.StatusNotFound {
 		t.Errorf("olmayan dosya: %d, beklenen 404", rec.Code)
+	}
+	if rec := get(thumb(unscanned)); rec.Code != http.StatusNotFound {
+		t.Errorf("taranmamış dosya: %d, beklenen 404", rec.Code)
 	}
 	if get("/index.html"); !nextCalled {
 		t.Error("diğer istekler sonraki işleyiciye geçmeli")

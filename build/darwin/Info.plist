@@ -18,7 +18,7 @@
         <key>CFBundleIconFile</key>
         <string>iconfile</string>
         <key>LSMinimumSystemVersion</key>
-        <string>12.0</string>
+        <string>13.0</string>
         <key>NSDocumentsFolderUsageDescription</key>
         <string>Duplicate File Finder scans folders you select to find duplicate files.</string>
         <key>NSDesktopFolderUsageDescription</key>

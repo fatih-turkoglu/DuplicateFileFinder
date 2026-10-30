@@ -186,6 +186,29 @@ func TestMoveConflict(t *testing.T) {
 	e.mustRecord(mevcut, "eski")
 }
 
+// Varlık kontrolünden sonra hedefte beliren bir dosyanın üzerine yazılmamalı
+// (os.Rename Windows'ta da Unix'te de yazardı).
+func TestRenameNoReplace(t *testing.T) {
+	e := setup(t)
+	a := e.file("a.txt", "yeni")
+	b := e.file("b.txt", "eski")
+
+	if err := renameNoReplace(a, b); !errors.Is(err, ErrExists) {
+		t.Fatalf("hata = %v, beklenen ErrExists", err)
+	}
+	e.mustHave(a, "yeni")
+	e.mustHave(b, "eski")
+
+	c := filepath.Join(e.dir, "c.txt")
+	if err := renameNoReplace(a, c); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Lstat(a); !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("kaynak hâlâ var: %v", err)
+	}
+	e.mustHave(c, "yeni")
+}
+
 func TestMoveInvalidTargets(t *testing.T) {
 	e := setup(t)
 	a := e.file("a.txt", "aaa")

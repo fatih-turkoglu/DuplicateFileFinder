@@ -121,10 +121,22 @@ func unescape(s string) string {
 	return b.String()
 }
 
-// Dir, dil dosyalarının klasörüdür: DUPLICATEFILE_LANG_DIR tanımlıysa o,
-// değilse exe'nin yanındaki "lang".
+// DirEnv, dil klasörünü değiştiren ortam değişkenidir.
+const DirEnv = "DUPLICATEFILE_LANG_DIR"
+
+// DirOverride, DirEnv mutlak bir yolsa onu döner; göreli değer uygulamanın
+// başlatıldığı klasöre göre değişeceğinden yok sayılır.
+func DirOverride() string {
+	if d := os.Getenv(DirEnv); filepath.IsAbs(d) {
+		return d
+	}
+	return ""
+}
+
+// Dir, dil dosyalarının klasörüdür: DirOverride doluysa o, değilse exe'nin
+// yanındaki "lang".
 func Dir() string {
-	if d := os.Getenv("DUPLICATEFILE_LANG_DIR"); d != "" {
+	if d := DirOverride(); d != "" {
 		return d
 	}
 	exe, err := os.Executable()

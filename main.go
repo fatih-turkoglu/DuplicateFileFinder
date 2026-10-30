@@ -35,7 +35,7 @@ func main() {
 		MinHeight: 480,
 		AssetServer: &assetserver.Options{
 			Assets:     assets,
-			Middleware: thumbMiddleware(newThumbCache(64 << 20)), // küçük resimler, en fazla 64 MB
+			Middleware: thumbMiddleware(newThumbCache(64<<20), app.isIndexed), // küçük resimler, en fazla 64 MB
 		},
 		BackgroundColour: bg,
 		OnStartup:        app.startup,

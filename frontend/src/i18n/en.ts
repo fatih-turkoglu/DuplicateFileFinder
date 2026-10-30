@@ -303,6 +303,7 @@ export const en: Record<string, string> = {
   'settings.dbScans.one': '{count} scan',
   'settings.dbScans.other': '{count} scans',
   'settings.showFolder': 'Show in folder',
+  'settings.dbPrivacy': 'The database contains the names and locations of scanned files. Keep it in a private folder; avoid shared and network folders.',
   'settings.moveDb': 'Move to another folder…',
   'settings.moveDbDialog': 'Folder to move the database to',
   'settings.moveDefault': 'Move to default location',

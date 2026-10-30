@@ -40,8 +40,19 @@ func DefaultPath() (string, error) {
 // Open, verilen yoldaki veritabanını açar (yoksa oluşturur) ve şemayı
 // güncel sürüme taşır.
 func Open(ctx context.Context, path string) (*DB, error) {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, fmt.Errorf("db: could not create folder: %w", err)
+	}
+	// Kayıtlar taranan dosyaların adlarını ve konumlarını içerir; dosya
+	// yalnızca kullanıcıya açık olsun. SQLite WAL/SHM dosyalarını da ana
+	// dosyanın izinleriyle oluşturur. Eski sürümlerin 0644 dosyaları düzeltilir.
+	if f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0o600); err != nil {
+		return nil, fmt.Errorf("db: could not open: %w", err)
+	} else {
+		f.Close()
+	}
+	if err := os.Chmod(path, 0o600); err != nil {
+		return nil, fmt.Errorf("db: could not restrict permissions: %w", err)
 	}
 
 	conn, err := sql.Open("sqlite", dsn(path))

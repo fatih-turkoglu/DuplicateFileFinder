@@ -16,8 +16,8 @@ if (-not $version) { throw 'wails.json içinde info.productVersion yok' }
 # frontend\dist'in var olmasını gerektirir (temiz klonda yoktur).
 Push-Location frontend
 try {
-    npm install
-    if ($LASTEXITCODE) { throw 'npm install başarısız' }
+    npm ci --no-audit --no-fund
+    if ($LASTEXITCODE) { throw 'npm ci başarısız' }
     npm run build
     if ($LASTEXITCODE) { throw 'arayüz derlemesi başarısız' }
 } finally { Pop-Location }
@@ -27,6 +27,9 @@ if (-not $SkipTests) {
     if ($LASTEXITCODE) { throw 'go vet başarısız' }
     go test ./... -count=1
     if ($LASTEXITCODE) { throw 'Go testleri başarısız' }
+    # Bilinen açık içeren Go sürümü ya da modülüyle derlenmesin.
+    go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+    if ($LASTEXITCODE) { throw 'govulncheck açık buldu' }
     Push-Location frontend
     try {
         npm test
@@ -51,4 +54,29 @@ Copy-Item 'lang\*.lng' $langOut -Force
 Write-Host ("Dil dosyaları: {0}" -f ((Get-ChildItem $langOut -Filter *.lng).BaseName -join ', '))
 
 $exe = Get-Item 'build\bin\DuplicateFileFinder.exe'
+
+# Dağıtım için Authenticode imzası (isteğe bağlı): DUPLICATEFILE_SIGN_CERT, kullanıcı
+# sertifika deposundaki kod imzalama sertifikasının SHA-1 parmak izidir.
+if ($env:DUPLICATEFILE_SIGN_CERT) {
+    $signtool = (Get-Command signtool.exe -ErrorAction SilentlyContinue).Source
+    if (-not $signtool) {
+        $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue |
+            Sort-Object FullName | Select-Object -Last 1 -ExpandProperty FullName
+    }
+    if (-not $signtool) { throw 'signtool.exe bulunamadı (Windows SDK gerekli)' }
+    $tsa = if ($env:DUPLICATEFILE_TIMESTAMP_URL) { $env:DUPLICATEFILE_TIMESTAMP_URL } else { 'http://timestamp.digicert.com' }
+    & $signtool sign /sha1 $env:DUPLICATEFILE_SIGN_CERT /fd SHA256 /tr $tsa /td SHA256 $exe.FullName
+    if ($LASTEXITCODE) { throw 'imzalama başarısız' }
+    & $signtool verify /pa $exe.FullName
+    if ($LASTEXITCODE) { throw 'imza doğrulanamadı' }
+} else {
+    Write-Host 'İmzasız derleme (dağıtım için DUPLICATEFILE_SIGN_CERT tanımlayın).' -ForegroundColor Yellow
+}
+
+# İndirenlerin dosyayı doğrulayabilmesi için SHA-256 özetleri (sha256sum biçimi).
+$sums = Get-ChildItem 'build\bin' -Recurse -File -Include *.exe, *.lng | ForEach-Object {
+    '{0}  {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.FullName.Substring((Resolve-Path 'build\bin').Path.Length + 1).Replace('\', '/')
+}
+[IO.File]::WriteAllLines((Join-Path (Resolve-Path 'build\bin') 'SHA256SUMS.txt'), [string[]]$sums)
+
 Write-Host ("Duplicate File Finder {0}: {1} ({2:N1} MB)" -f $version, $exe.FullName, ($exe.Length / 1MB)) -ForegroundColor Green

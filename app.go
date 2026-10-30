@@ -45,6 +45,7 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	logEnvOverrides(ctx)
 	a.db, a.dbWarning, a.dbErr = openConfiguredDB(ctx)
 	if a.dbErr != nil {
 		// Uygulama yine açılsın; arayüz hatayı Ayarlar'da gösterir.
@@ -100,6 +101,17 @@ func (a *App) acquire() (release func(), err error) {
 // boş metin döner.
 func (a *App) SelectFolder(title string) (string, error) {
 	return runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: title})
+}
+
+// isIndexed, yolun veritabanında kayıtlı (bir taramada bulunmuş) olup
+// olmadığını söyler; küçük resim adresi yalnızca bu dosyaları okur.
+func (a *App) isIndexed(path string) bool {
+	d, err := a.getDB()
+	if err != nil {
+		return false
+	}
+	_, err = d.FileByPath(context.Background(), path)
+	return err == nil
 }
 
 // ShowInExplorer Finder ya da Gezgin'i açıp dosyayı seçili gösterir.

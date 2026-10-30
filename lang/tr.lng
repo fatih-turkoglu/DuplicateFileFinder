@@ -265,6 +265,7 @@ settings.dbCustom = Özel konum
 settings.dbRecords.other = {count} dosya kaydı
 settings.dbScans.other = {count} tarama
 settings.showFolder = Klasörde göster
+settings.dbPrivacy = Veritabanı taranan dosyaların adlarını ve konumlarını içerir. Kişisel bir klasörde tutun; paylaşılan ve ağ klasörlerinden kaçının.
 settings.moveDb = Başka klasöre taşı…
 settings.moveDbDialog = Veritabanının taşınacağı klasör
 settings.moveDefault = Varsayılan konuma taşı

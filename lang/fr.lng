@@ -291,6 +291,7 @@ settings.dbRecords.other = {count} entrées de fichiers
 settings.dbScans.one = {count} analyse
 settings.dbScans.other = {count} analyses
 settings.showFolder = Afficher dans le dossier
+settings.dbPrivacy = La base de données contient le nom et l’emplacement des fichiers analysés. Conservez-la dans un dossier personnel ; évitez les dossiers partagés et réseau.
 settings.moveDb = Déplacer vers un autre dossier…
 settings.moveDbDialog = Dossier vers lequel déplacer la base de données
 settings.moveDefault = Déplacer vers l’emplacement par défaut

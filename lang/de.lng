@@ -291,6 +291,7 @@ settings.dbRecords.other = {count} Dateieinträge
 settings.dbScans.one = {count} Scan
 settings.dbScans.other = {count} Scans
 settings.showFolder = Im Ordner anzeigen
+settings.dbPrivacy = Die Datenbank enthält Namen und Speicherorte der gescannten Dateien. Bewahren Sie sie in einem privaten Ordner auf; vermeiden Sie freigegebene und Netzwerkordner.
 settings.moveDb = In anderen Ordner verschieben …
 settings.moveDbDialog = Ordner, in den die Datenbank verschoben wird
 settings.moveDefault = An den Standardort verschieben

@@ -17,6 +17,7 @@ var (
 	procSHFileOperationW = shell32.NewProc("SHFileOperationW")
 	kernel32             = syscall.NewLazyDLL("kernel32.dll")
 	procGetDriveTypeW    = kernel32.NewProc("GetDriveTypeW")
+	procMoveFileExW      = kernel32.NewProc("MoveFileExW")
 )
 
 const (
@@ -30,6 +31,8 @@ const (
 	driveFixed = 3
 
 	errorNotSameDevice = syscall.Errno(17)
+	errorFileExists    = syscall.Errno(80)
+	errorAlreadyExists = syscall.Errno(183)
 )
 
 // shFileOpStruct, SHFILEOPSTRUCTW'nin 64 bit karşılığıdır (shellapi.h 64 bitte
@@ -93,4 +96,26 @@ func hasRecycleBin(path string) bool {
 
 func isCrossDevice(err error) bool {
 	return errors.Is(err, errorNotSameDevice)
+}
+
+// renameNoReplace, os.Rename'den farklı olarak hedefte bir dosya varsa onun
+// üzerine yazmaz (MOVEFILE_REPLACE_EXISTING verilmez). Farklı sürücüde
+// ERROR_NOT_SAME_DEVICE döner; kopyalamayı çağıran yapar.
+func renameNoReplace(src, dest string) error {
+	from, err := syscall.UTF16PtrFromString(src)
+	if err != nil {
+		return err
+	}
+	to, err := syscall.UTF16PtrFromString(dest)
+	if err != nil {
+		return err
+	}
+	r, _, callErr := procMoveFileExW.Call(uintptr(unsafe.Pointer(from)), uintptr(unsafe.Pointer(to)), 0)
+	if r != 0 {
+		return nil
+	}
+	if callErr == errorFileExists || callErr == errorAlreadyExists {
+		return ErrExists
+	}
+	return &os.LinkError{Op: "rename", Old: src, New: dest, Err: callErr}
 }

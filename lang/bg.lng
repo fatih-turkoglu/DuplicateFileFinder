@@ -291,6 +291,7 @@ settings.dbRecords.other = {count} записа на файлове
 settings.dbScans.one = {count} сканиране
 settings.dbScans.other = {count} сканирания
 settings.showFolder = Показване в папката
+settings.dbPrivacy = Базата данни съдържа имената и местоположенията на сканираните файлове. Дръжте я в лична папка; избягвайте споделени и мрежови папки.
 settings.moveDb = Преместване в друга папка…
 settings.moveDbDialog = Папка, в която да се премести базата данни
 settings.moveDefault = Преместване в местоположението по подразбиране

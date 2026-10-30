@@ -291,6 +291,7 @@ settings.dbRecords.other = {count} registros de arquivos
 settings.dbScans.one = {count} verificação
 settings.dbScans.other = {count} verificações
 settings.showFolder = Mostrar na pasta
+settings.dbPrivacy = A base de dados contém os nomes e localizações dos ficheiros analisados. Mantenha-a numa pasta pessoal; evite pastas partilhadas e de rede.
 settings.moveDb = Mover para outra pasta…
 settings.moveDbDialog = Pasta para onde mover o banco de dados
 settings.moveDefault = Mover para o local padrão

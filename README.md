@@ -20,8 +20,8 @@ silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
 
 ### macOS kurulumu
 
-- **macOS 12 Monterey veya üzeri.** Apple Silicon (M serisi) ve Intel desteklenir;
-  Universal paket her ikisini de içerir. Alt sürüm sınırı [Go 1.26 gereksiniminden](https://go.dev/wiki/MinimumRequirements) gelir.
+- **macOS 13 Ventura veya üzeri.** Apple Silicon (M serisi) ve Intel desteklenir;
+  Universal paket her ikisini de içerir. Alt sürüm sınırı [Go 1.27 gereksiniminden](https://go.dev/wiki/MinimumRequirements) gelir.
 - ZIP’i açın, **DuplicateFileFinder.app** dosyasını **Uygulamalar** klasörüne sürükleyin ve açın.
   Dil dosyaları uygulamanın içindedir; ayrıca `lang` klasörü taşımanız gerekmez.
 - WKWebView macOS ile gelir; WebView2 kurulumuna gerek yoktur.
@@ -81,13 +81,19 @@ klasöre koyup çalıştırın (`lang` olmadan da çalışır; arayüz İngilizc
   klasörlerle sınırlayın; `.app/Contents` ve sistem klasörlerindeki dosyaları
   kopya olarak görünmeleri nedeniyle silmeyin. macOS’ta **Gizli ve sistem
   dosyalarını atla** açıkken bilinen sistem klasörleri, kullanıcı Library klasörü
-  ve uygulama/arşiv paketleri tarama dışında bırakılır. Bu koruma tüm olası
+  ve uygulama/arşiv paketleri tarama dışında bırakılır; Windows’ta aynı seçenek
+  `Windows`, `Program Files`, `ProgramData`, `$Recycle.Bin` gibi sistem
+  klasörlerini ve kullanıcı `AppData` klasörünü (Temp hariç) atlar. Bu koruma tüm olası
   uygulama veri dosyalarını tanımaz; kişisel klasörlerle sınırlı tarama önerilir.
 - **Mac uygulama koruması:** bilinen sistem yolları ve `.app`, `.framework`,
   `.bundle`, Fotoğraflar arşivi gibi paketlerin içeriği, eski tarama sonuçlarından
   seçilse dahi silinemez, taşınamaz veya yeniden adlandırılamaz. Bu konumlar
   son kopya korumasında kişisel dosyanın yedeği sayılmaz. Aynı fiziksel dosyaya
   çıkan farklı yollar da bağımsız bir yedek olarak kabul edilmez.
+- **Windows sistem koruması:** yukarıdaki Windows sistem klasörlerindeki ve
+  `AppData` altındaki dosyalar aynı şekilde silinemez, taşınamaz veya yeniden
+  adlandırılamaz; bu klasörlere taşıma da yapılamaz. Junction ve sembolik
+  bağlantılar çözülerek denetlenir.
 - **Son kopya koruması:** bir dosya, diskte değişmeden duran bir eşi
   (birebir kopyası ya da benzer görsellerde eşik içindeki benzeri) kalmıyorsa
   **silinmez**. Bir grubun bütün dosyaları seçilse bile hepsi silinemez.
@@ -153,6 +159,8 @@ Windows:
 klasörde tutulur (taşınabilir kullanım ve testler için).
 
 `DUPLICATEFILE_LANG_DIR` tanımlıysa dil dosyaları varsayılan konum yerine o klasörden okunur.
+İki değişken de yalnızca **mutlak yol** olarak kabul edilir; göreli değerler yok sayılır.
+Kullanılan ya da yok sayılan değer uygulama günlüğüne yazılır.
 
 Uygulamayı tamamen kaldırmak için `.app` / `.exe` dosyasını (Windows’ta yanındaki `lang` klasörünü de) ve ilgili platformun yukarıdaki veri klasörlerini silmeniz yeterlidir.
 
@@ -176,7 +184,7 @@ SQLite (saf Go, `modernc.org/sqlite`). Masaüstü kabuğu ve macOS’un yerel Fo
 
 ### macOS geliştirme
 
-Gerekenler: **Go 1.26.x**, **Node.js 22.13+** (24 LTS önerilir), npm ve Xcode
+Gerekenler: **Go 1.27.3+**, **Node.js 22.13+** (24 LTS önerilir), npm ve Xcode
 Command Line Tools. Geliştirme araçları kullanıcı ortamında ya da `.tools/go`,
 `.tools/bin` altında bulunabilir; sistem ayarları değiştirilmez.
 
@@ -199,10 +207,15 @@ saklar ve geliştirmede dil dosyalarını doğrudan `lang/` klasöründen okutur
 
 Çıktı: **`build/bin/DuplicateFileFinder.app`** ve sürüm/mimari adlı ZIP.
 Betik kilitli npm bağımlılıklarını kurar, arayüzü derler, Go vet/test ve arayüz
-testlerini çalıştırır; dilleri pakete koyar, son paketi imzalayıp doğrular.
+testlerini ve `govulncheck` taramasını çalıştırır; dilleri pakete koyar, son paketi
+imzalayıp doğrular ve ZIP’in yanına `.sha256` özetini yazar.
 `wails.json` sürümün tek kaynağıdır. Universal derleme macOS üzerinde yapılır.
-Yalnızca yerel deneme için ad hoc imza kullanılır; Developer ID ile imzalamak için
-`DUPLICATEFILE_SIGN_IDENTITY` tanımlanabilir. Dağıtım için ayrıca Apple notarizasyonu gerekir.
+Yalnızca yerel deneme için ad hoc imza kullanılır. Dağıtım için:
+
+- `DUPLICATEFILE_SIGN_IDENTITY` — Developer ID Application kimliği; hardened runtime
+  ve zaman damgasıyla imzalanır.
+- `DUPLICATEFILE_NOTARY_PROFILE` — `xcrun notarytool store-credentials` ile kaydedilen
+  profil; tanımlıysa paket notarize edilir, bilet pakete eklenir (staple) ve ZIP yeniden üretilir.
 
 Temiz klonda `go test ./...` öncesi `cd frontend && npm ci && npm run build`
 çalışmalıdır; Go arayüz dosyalarını içine gömer. `build.sh` bu sırayı otomatik uygular.
@@ -234,9 +247,9 @@ yerel betiklere izin vermek isterseniz bir kez `Set-ExecutionPolicy -Scope Curre
 `UserPolicy` doluysa politika Group Policy ile belirlenmiştir ve bu komutlarla değiştirilemez.
 
 Bu yalnızca o terminal oturumunun `PATH`'ini ayarlar. `.tools\` yoksa (ör. depoyu yeni
-klonladıysanız): Go 1.26 ve Node.js 22.13+’ın resmi Windows **zip** sürümlerini `.tools\go` ve
+klonladıysanız): Go 1.27.3+ ve Node.js 22.13+’ın resmi Windows **zip** sürümlerini `.tools\go` ve
 `.tools\node` klasörlerine, isterseniz Git for Windows **PortableGit**'i `.tools\git`
-klasörüne açın; sonra `go install github.com/wailsapp/wails/v2/cmd/wails@latest`.
+klasörüne açın; sonra `go install github.com/wailsapp/wails/v2/cmd/wails@v2.17.0`.
 
 ### Windows çalıştırma ve derleme
 
@@ -248,7 +261,15 @@ wails dev          # canlı geliştirme (arayüz değişiklikleri anında yansı
 `build.ps1` önce bütün testleri çalıştırır; sürümü `wails.json` içindeki
 `info.productVersion`'dan alır (exe özellikleri ve uygulamadaki *Hakkında* aynı
 kaynaktan) ve `-trimpath` ile derler. Sürüm değiştirmek için yalnızca `wails.json`
-güncellenir.
+güncellenir. Arayüz bağımlılıkları `npm ci` ile yalnızca `package-lock.json`’dan kurulur,
+Go bağımlılıkları ve araç zinciri `govulncheck` ile taranır.
+
+Çıktı klasörüne exe ve dil dosyalarının `SHA256SUMS.txt` özetleri yazılır
+(`sha256sum -c SHA256SUMS.txt` ya da `Get-FileHash` ile doğrulanır). Dağıtım için
+Authenticode imzası: `DUPLICATEFILE_SIGN_CERT` ortam değişkenine kullanıcı sertifika
+deposundaki kod imzalama sertifikasının SHA-1 parmak izini verin (Windows SDK’daki
+`signtool` gerekir; zaman damgası sunucusu `DUPLICATEFILE_TIMESTAMP_URL` ile değiştirilebilir).
+İmza, `SHA256SUMS.txt`’den önce atılır; özetler imzalı exe’ye aittir.
 
 ### Testler
 

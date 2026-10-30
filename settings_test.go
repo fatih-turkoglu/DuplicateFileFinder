@@ -31,6 +31,11 @@ func TestDataDirEnv(t *testing.T) {
 	if p, _ := configFile(); p != filepath.Join(dir, "config.json") {
 		t.Errorf("configFile = %s", p)
 	}
+	// Göreli yol başlatılan klasöre göre değişir; yok sayılmalı.
+	t.Setenv(dataDirEnv, "veri")
+	if p, _ := defaultDBPath(); !filepath.IsAbs(p) || filepath.Dir(p) == "veri" {
+		t.Errorf("göreli değer kullanıldı: defaultDBPath = %s", p)
+	}
 }
 
 func TestMoveDatabase(t *testing.T) {

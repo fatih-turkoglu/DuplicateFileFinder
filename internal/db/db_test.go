@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -29,6 +30,35 @@ func paths(files []File) []string {
 	}
 	sort.Strings(p)
 	return p
+}
+
+// Veritabanı taranan dosyaların yollarını içerir; başka kullanıcılar okuyamamalı.
+func TestOpenRestrictsPermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows izinleri klasörün ACL'sinden gelir")
+	}
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "index.db")
+	if err := os.WriteFile(path, nil, 0o644); err != nil { // eski sürümün dosyası
+		t.Fatal(err)
+	}
+	d, err := Open(ctx, path)
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	defer d.Close()
+	if _, err := d.conn.ExecContext(ctx, `INSERT INTO scans (root_path, started_at) VALUES ('/', 1)`); err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range []string{path, path + "-wal"} {
+		info, err := os.Stat(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if perm := info.Mode().Perm(); perm != 0o600 {
+			t.Errorf("%s: izin %o, beklenen 600", filepath.Base(p), perm)
+		}
+	}
 }
 
 func TestOpenMigratesAndReopens(t *testing.T) {

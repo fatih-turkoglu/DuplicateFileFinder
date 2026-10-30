@@ -319,6 +319,7 @@ settings.dbScans.one = {count} scanare
 settings.dbScans.few = {count} scanări
 settings.dbScans.other = {count} de scanări
 settings.showFolder = Afișează în folder
+settings.dbPrivacy = Baza de date conține numele și locațiile fișierelor scanate. Păstrați-o într-un folder personal; evitați folderele partajate și de rețea.
 settings.moveDb = Mută în alt folder…
 settings.moveDbDialog = Folderul în care se mută baza de date
 settings.moveDefault = Mută în locația implicită
