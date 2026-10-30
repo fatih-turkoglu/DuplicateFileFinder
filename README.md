@@ -1,8 +1,22 @@
+<div align="center">
+
+<img src="build/appicon.png" width="96" alt="">
+
 # Duplicate File Finder
 
-Windows ve macOS için kopya ve benzer dosya bulucu. Klasörleri tarar, içeriği birebir aynı
-dosyaları ya da birbirine benzeyen fotoğrafları gruplar; seçtiklerinizi güvenle
-silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
+**Türkçe** · [English](README.en.md)
+
+Windows ve macOS için kopya ve benzer dosya bulucu.
+
+[![Son sürüm](https://img.shields.io/github/v/release/fatih-turkoglu/DuplicateFileFinder?label=s%C3%BCr%C3%BCm)](https://github.com/fatih-turkoglu/DuplicateFileFinder/releases/latest)
+[![İndirme](https://img.shields.io/github/downloads/fatih-turkoglu/DuplicateFileFinder/total?label=indirme)](https://github.com/fatih-turkoglu/DuplicateFileFinder/releases)
+
+<img src="docs/screenshots/tr/duplicates.png" width="800" alt="Kopyalar sayfası: içeriği aynı dosyalar gruplar hâlinde">
+
+</div>
+
+Klasörleri tarar, içeriği birebir aynı dosyaları ya da birbirine benzeyen fotoğrafları
+gruplar; seçtiklerinizi güvenle silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
 
 - **Birebir kopyalar:** boyut → dosyanın başı ve sonu → tamamı (xxh3) sırasıyla
   karşılaştırılır; yalnızca gerektiği kadar okunur.
@@ -10,9 +24,40 @@ silmenizi, taşımanızı ya da yeniden adlandırmanızı sağlar.
   düzenlenmiş fotoğraflar algısal hash (dHash) ile bulunur.
 - **Hızlı tekrar tarama:** taranan dosyaların bilgisi bir veritabanında saklanır;
   değişmeyen dosyalar bir sonraki taramada yeniden okunmaz.
+- **Son kopya koruması:** bir grubun bütün dosyaları asla silinmez; varsayılan silme
+  Geri Dönüşüm Kutusu / Çöp Sepeti’ne gönderir.
 - Açık/koyu tema, pencere boyutuna uyan (responsive) Material arayüz.
 - Çok dilli: Türkçe, İngilizce, Almanca, Fransızca, Portekizce, Romence, Bulgarca
   (sistemin diline göre otomatik; yenileri dil dosyası eklenerek).
+
+<a id="indir"></a>
+
+## İndir
+
+| Platform | Dosya | |
+|---|---|---|
+| Windows 10/11 (64 bit) | `DuplicateFileFinder-windows-amd64.zip` | [⬇ ZIP indir](https://github.com/fatih-turkoglu/DuplicateFileFinder/releases/latest/download/DuplicateFileFinder-windows-amd64.zip) |
+| macOS 13+ (Apple Silicon + Intel) | `DuplicateFileFinder-macos-universal.zip` | [⬇ ZIP indir](https://github.com/fatih-turkoglu/DuplicateFileFinder/releases/latest/download/DuplicateFileFinder-macos-universal.zip) |
+
+- Bütün sürümler ve sürüm notları: **[Releases](https://github.com/fatih-turkoglu/DuplicateFileFinder/releases)**
+- Kaynak kodu: [ZIP olarak indir](https://github.com/fatih-turkoglu/DuplicateFileFinder/archive/refs/heads/main.zip)
+  ya da `git clone https://github.com/fatih-turkoglu/DuplicateFileFinder.git`
+- Her arşivin yanında bir `.sha256` özeti bulunur. Doğrulama: Windows’ta
+  `Get-FileHash DuplicateFileFinder-windows-amd64.zip`, macOS’ta
+  `shasum -a 256 -c DuplicateFileFinder-macos-universal.zip.sha256`.
+
+Kurulum ayrıntıları için [Windows kurulumu](#windows-kurulumu) ve [macOS kurulumu](#macos-kurulumu) bölümlerine bakın.
+
+## Ekran görüntüleri
+
+| | |
+|---|---|
+| <img src="docs/screenshots/tr/scan.png" alt="Tarama ayarları"> | <img src="docs/screenshots/tr/summary.png" alt="Tarama özeti"> |
+| **Tara** — klasörleri ve aranacak türü seçin | **Özet** — kazanılabilir alan ve tarama istatistikleri |
+| <img src="docs/screenshots/tr/similar.png" alt="Benzer görseller"> | <img src="docs/screenshots/tr/compare.png" alt="Görselleri karşılaştırma"> |
+| **Benzer görseller** — küçük resim, çözünürlük ve benzerlik oranı | **Karşılaştır** — büyük önizlemeyle yan yana |
+| <img src="docs/screenshots/tr/duplicates-dark.png" alt="Koyu tema"> | <img src="docs/screenshots/tr/settings.png" alt="Ayarlar"> |
+| **Koyu tema** | **Ayarlar** — tema, dil, veritabanı ve bakım |
 
 ---
 
@@ -191,7 +236,7 @@ Command Line Tools. Geliştirme araçları kullanıcı ortamında ya da `.tools/
 ```bash
 xcode-select --install  # araçlar kurulu değilse, bir kez
 source ./env.sh
-go install github.com/wailsapp/wails/v2/cmd/wails@v2.16.0
+go install github.com/wailsapp/wails/v2/cmd/wails@v2.17.0
 wails dev
 ```
 
@@ -205,7 +250,8 @@ saklar ve geliştirmede dil dosyalarını doğrudan `lang/` klasöründen okutur
 ./build.sh --skip-tests    # testleri atla
 ```
 
-Çıktı: **`build/bin/DuplicateFileFinder.app`** ve sürüm/mimari adlı ZIP.
+Çıktı: **`build/bin/DuplicateFileFinder.app`** ve `DuplicateFileFinder-macos-<mimari>.zip`
+(`universal`, `arm64` ya da `amd64`).
 Betik kilitli npm bağımlılıklarını kurar, arayüzü derler, Go vet/test ve arayüz
 testlerini ve `govulncheck` taramasını çalıştırır; dilleri pakete koyar, son paketi
 imzalayıp doğrular ve ZIP’in yanına `.sha256` özetini yazar.
@@ -270,6 +316,20 @@ Authenticode imzası: `DUPLICATEFILE_SIGN_CERT` ortam değişkenine kullanıcı 
 deposundaki kod imzalama sertifikasının SHA-1 parmak izini verin (Windows SDK’daki
 `signtool` gerekir; zaman damgası sunucusu `DUPLICATEFILE_TIMESTAMP_URL` ile değiştirilebilir).
 İmza, `SHA256SUMS.txt`’den önce atılır; özetler imzalı exe’ye aittir.
+
+Son olarak exe ve `lang` klasörü `buildin\DuplicateFileFinder-windows-amd64.zip`
+arşivine konur ve yanına `.sha256` özeti yazılır.
+
+### Sürüm yayınlama
+
+1. `wails.json` içindeki `info.productVersion` değerini güncelleyin.
+2. Windows’ta `.uild.ps1`, macOS’ta `./build.sh --universal` çalıştırın.
+3. GitHub’da `v<sürüm>` etiketiyle yeni bir release oluşturup şu dosyaları ekleyin:
+   `DuplicateFileFinder-windows-amd64.zip`, `DuplicateFileFinder-macos-universal.zip`
+   ve ikisinin `.sha256` dosyaları.
+
+Arşiv adlarında sürüm numarası bulunmaz; böylece [İndir](#indir) bölümündeki
+`releases/latest/download/...` bağlantıları her yeni sürümde değiştirilmeden çalışır.
 
 ### Testler
 

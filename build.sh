@@ -55,7 +55,8 @@ sign_opts=()
 [[ "$identity" == - ]] || sign_opts=(--options runtime --timestamp)
 codesign --force --deep ${sign_opts[@]+"${sign_opts[@]}"} --sign "$identity" "$app" # empty-array safe on Bash 3.2
 codesign --verify --deep --strict "$app"
-archive="build/bin/DuplicateFileFinder-$version-${target#darwin/}.zip"
+# No version in the name, so the README's releases/latest/download link stays stable.
+archive="build/bin/DuplicateFileFinder-macos-${target#darwin/}.zip"
 ditto -c -k --sequesterRsrc --keepParent "$app" "$archive"
 # Optional notarization: DUPLICATEFILE_NOTARY_PROFILE names a profile stored with
 # `xcrun notarytool store-credentials`. The ticket is stapled, then re-archived.

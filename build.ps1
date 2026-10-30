@@ -79,4 +79,12 @@ $sums = Get-ChildItem 'build\bin' -Recurse -File -Include *.exe, *.lng | ForEach
 }
 [IO.File]::WriteAllLines((Join-Path (Resolve-Path 'build\bin') 'SHA256SUMS.txt'), [string[]]$sums)
 
+# Yayın arşivi: exe + lang. Adda sürüm yok; README'deki releases/latest/download bağlantısı sabit kalsın.
+$zip = 'build\bin\DuplicateFileFinder-windows-amd64.zip'
+Remove-Item $zip -ErrorAction SilentlyContinue
+Compress-Archive -Path $exe.FullName, $langOut -DestinationPath $zip
+$zipHash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+[IO.File]::WriteAllText((Resolve-Path $zip).Path + '.sha256', "$zipHash  $(Split-Path $zip -Leaf)`n")
+Write-Host "Arşiv: $zip"
+
 Write-Host ("Duplicate File Finder {0}: {1} ({2:N1} MB)" -f $version, $exe.FullName, ($exe.Length / 1MB)) -ForegroundColor Green
